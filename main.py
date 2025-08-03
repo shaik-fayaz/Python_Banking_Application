@@ -27,9 +27,10 @@ def main():
         elif choice == '3':
             if customer_obj:
                 amount = account.deposit(customer_obj)
-                customer_obj.balance += amount
+                # customer_obj.balance += amount
                 if amount > 0:
                     print(f"${amount:.2f} deposited successfully!")
+                    print(f"New Balance: ${customer_obj.balance:.2f}")
             else:
                 print("Please create an account first!")
         elif choice == '4':
