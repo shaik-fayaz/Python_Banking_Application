@@ -22,7 +22,7 @@ def main():
             account.search_customer()
         elif choice == '3':
             if customer_obj:
-                account.show_balance(customer_obj)
+                account.show_balance()
             else:
                 print("Please create an account first!")
         elif choice == '4':

@@ -64,30 +64,50 @@ class Account:
         self.account_type = "Base Account"
         self.balance = 0.0
 
-def show_balance(account):
-    print(f"Customer: {account.name}")
-    print(f"Account Number: {account.account_number}")
-    print(f"Account Type: {account.account_type}")
-    print(f"Your balance is ${account.balance:.2f}")
+def show_balance():
+    
+    account_number = int(input("Enter account number: "))
+    if account_number in all_accounts:
+        account = all_accounts[account_number]
+        print(f"Customer: {account.name}")
+        print(f"Account Number: {account.account_number}")
+        print(f"Account Type: {account.account_type}")
+        print(f"Your balance is ${account.balance:.2f}")
+    else:
+        print("Account not found.")
 
 def deposit(customer):
-    amount = float(input("Enter an amount to be deposited: "))
     
-    if amount < 0:
-        print("That's not a valid amount")
-        return 0
+    account_number = int(input("Enter account number: "))
+    if account_number in all_accounts:
+        account = all_accounts[account_number]
+        
+        amount = float(input("Enter an amount to be deposited: "))
+    
+        if amount < 0:
+            print("That's not a valid amount")
+            return 0
+        else:
+            customer.balance += amount
+            return amount
     else:
-        customer.balance += amount
-        return amount
+        print("Account not found.")
+        return 0
 
 def withdraw(account):
-    amount = float(input("Enter an amount to be withdrawn: "))
     
-    if amount < 0:
-        print("Amount must be greater than 0")
+    account_number = int(input("Enter account number: "))
+    if account_number in all_accounts:
+        account = all_accounts[account_number]
+        amount = float(input("Enter an amount to be withdrawn: "))
+    
+        if amount < 0:
+            print("Amount must be greater than 0")
+            return 0
+        return amount
+    else:
+        print("Account not found.")
         return 0
-    return amount
-
 class CreditAccount(Account):
     def __init__(self, name, customer_number, account_number):
         super().__init__(name, customer_number, account_number)
