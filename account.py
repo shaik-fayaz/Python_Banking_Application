@@ -1,22 +1,22 @@
-# """
-# Fayaz Shaik
+"""
+Fayaz Shaik
 
-# # bank-application-py
-# Repository for same Bank Application Program in Python
+# bank-application-py
+Repository for same Bank Application Program in Python
 
-# Bank Application with 3 types of Account:
-# 1.⁠ ⁠Credit Account
-# 2. ⁠Debit Account
-# 3. ⁠Hybrid Account (linked to current but if no balance then can use credit)
+Bank Application with 3 types of Account:
+1.⁠ ⁠Credit Account
+2. ⁠Debit Account
+3. ⁠Hybrid Account (linked to current but if no balance then can use credit)
 
-# The program allows:
-# 1.⁠ ⁠Create Customer, user can have multiple accounts
-# 2.⁠ ⁠Search by customer number or account number to display details
-# 3.⁠ ⁠Allow credit/debit/check balance
-# 4.⁠ ⁠Use file system to persist the data so when I rerun program should be able to retrieve the data
-# 5.⁠ ⁠Create few Test cases
+The program allows:
+1.⁠ ⁠Create Customer, user can have multiple accounts
+2.⁠ ⁠Search by customer number or account number to display details
+3.⁠ ⁠Allow credit/debit/check balance
+4.⁠ ⁠Use file system to persist the data so when I rerun program should be able to retrieve the data
+5.⁠ ⁠Create few Test cases
 
-# """
+"""
 
 import random
 
@@ -41,7 +41,7 @@ class Customer:
         for i, account in enumerate(self.accounts, 1):
             print(f"{i}. Account #{account.account_number} - {account.account_type} - Balance: ${account.balance:.2f}")
 
-def search_account():
+def search_customer():
     """
     Search by customer number and display all their accounts
     """
@@ -161,11 +161,12 @@ def create_account():
     
     choice = input("Do you want to create a new customer? (y/n): ")
     if choice.lower() == 'n':
-        customer_number = input("Enter existing customer number: ")
+        customer_number = int(input("Enter existing customer number: "))
         if customer_number not in customers:
             print("Customer not found. Please create a new customer first.")
             return None
         customer_obj = customers[customer_number]
+        name = customer_obj.name  # Use existing customer's name
     else:
         name = input("Enter customer name: ")
         customer_number = random.randint(10000, 99999)

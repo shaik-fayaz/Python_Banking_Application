@@ -7,7 +7,7 @@ def main():
     while is_running:
         print("Banking Application")
         print("1. Create Account")
-        print("2. Search Account")
+        print("2. Search Customer")
         print("3. Show Balance")
         print("4. Deposit")
         print("5. Withdraw")
@@ -19,7 +19,7 @@ def main():
             customer_obj = account.create_account()
         elif choice == '2':
             # search account details by account info
-            account.search_account()
+            account.search_customer()
         elif choice == '3':
             if customer_obj:
                 account.show_balance(customer_obj)
