@@ -18,10 +18,35 @@ The program allows:
 
 """
 
+from pyclbr import Class
 import random
+import os
+import pickle
 
+file = "Bank_Project/data.pkl"
 ACCOUNT_TYPES = ["Credit Account", "Debit Account", "Hybrid Account"]
 
+def save_data():
+    """
+    Save the customers and accounts data to a file
+    """
+    with open(file, 'wb') as f:
+        pickle.dump(customers, f)
+        pickle.dump(all_accounts, f)
+    print("Data saved successfully.")
+    
+def load_data():
+    """
+    Load the customers and accounts data from a file
+    """
+
+    if os.path.exists(file):
+        with open(file, 'rb') as f:
+            customers = pickle.load(f)
+            all_accounts = pickle.load(f)
+        print("Data loaded successfully.")
+    else:
+        print("No data file found. Starting with empty data.")
 customers = {}  # {customer_number: Customer object}
 all_accounts = {}  # {account_number: Account object}
 class Customer:
@@ -57,9 +82,9 @@ def search_customer():
         print("No customer exists with this customer number.")
     
 class Account:
-    def __init__(self, name, customer_number, account_number):
-        self.name = name
-        self.customer_number = customer_number
+    def __init__(self, account_number):
+        # self.name = name
+        # self.customer_number = customer_number
         self.account_number = account_number
         self.account_type = "Base Account"
         self.balance = 0.0
@@ -76,7 +101,7 @@ def show_balance():
     else:
         print("Account not found.")
 
-def deposit(customer):
+def deposit():
     
     account_number = int(input("Enter account number: "))
     if account_number in all_accounts:
@@ -88,33 +113,33 @@ def deposit(customer):
             print("That's not a valid amount")
             return 0
         else:
-            customer.balance += amount
+            account.balance += amount
+            print(f"${amount:.2f} deposited successfully!")
+            print(f"New Balance: ${account.balance:.2f}")
+            save_data()  # Save data after deposit
             return amount
     else:
         print("Account not found.")
         return 0
 
-def withdraw(account):
+def withdraw():
     
     account_number = int(input("Enter account number: "))
     if account_number in all_accounts:
         account = all_accounts[account_number]
-        amount = float(input("Enter an amount to be withdrawn: "))
-    
-        if amount < 0:
-            print("Amount must be greater than 0")
-            return 0
+        
+        amount = account.withdraw()
         return amount
     else:
         print("Account not found.")
         return 0
 class CreditAccount(Account):
-    def __init__(self, name, customer_number, account_number):
-        super().__init__(name, customer_number, account_number)
+    def __init__(self, account_number):
+        super().__init__(account_number)
         self.account_type = "Credit Account"
         # self.credit_limit = 5000
 
-    def withdraw(customer):
+    def withdraw(self):
         amount = float(input("Enter amount to withdraw: "))
         # '''
         # based on account type it will allow withdrawal
@@ -126,27 +151,27 @@ class CreditAccount(Account):
         if amount < 0:
                 print("Amount must be greater than 0")
                 return 0
-        elif (customer.balance - amount) < -5000:
+        elif (self.balance - amount) < -5000:
                 print("Credit limit exceeded. Maximum credit limit is $5000")
                 return 0
         else:
                 self.balance -= amount
                 print(f"Withdrawal successful. New balance is ${self.balance:.2f}")
-                return amount
+                save_data()  # Save data after withdrawal
             
             
 class DebitAccount(Account):
-    def __init__(self, name, customer_number, account_number):
-        super().__init__(name, customer_number, account_number)
+    def __init__(self, account_number):
+        super().__init__(account_number)
         self.account_type = "Debit Account"
 
-    def withdraw(customer):
+    def withdraw(self):
         amount = float(input("Enter amount to withdraw: "))
 
         '''
         for debit it cannot go negative
         '''
-        if amount > customer.balance:
+        if amount > self.balance:
             print("Insufficient Funds")
             return 0
         elif amount < 0:
@@ -155,26 +180,33 @@ class DebitAccount(Account):
         else:
             self.balance -= amount
             print(f"Withdrawal successful. New balance is ${self.balance:.2f}")
+            save_data()
             return amount
         
-# Class HybridAccount(Account):
-#     def __init__(self, name, customer_number, account_number):
-#         super().__init__(name, customer_number, account_number)
-#         self.account_type = "Hybrid Account"
+class HybridAccount(Account):
+    def __init__(self, account_number):
+        super().__init__(account_number)
+        self.account_type = "Hybrid Account"
 
-    # def withdraw(customer):
-    #     amount = float(input("Enter amount to withdraw: "))
-    #     if amount < 0:
-    #         print("Amount must be greater than 0")
-    #         return 0
-    #     elif (customer.balance - amount) < -5000:
-    #         print("Credit limit exceeded. Maximum credit limit is $5000")
-    #         return 0
-    #     else:
-    #         self.balance -= amount
-    #         print(f"Withdrawal successful. New balance is ${self.balance:.2f}")
-    #         return amount
-
+    def withdraw(self):
+        amount = float(input("Enter amount to withdraw: "))
+        if amount < 0:
+            print("Amount must be greater than 0")
+            return 0
+        elif (self.balance - amount) < -2000:
+            print("Credit limit exceeded. Maximum credit limit is $2000")
+            return 0
+        else:
+            if self.balance >= amount:
+                self.balance -= amount
+                print(f"Withdrawal successful. New balance is ${self.balance:.2f}")
+            else:
+                credit_used = amount - self.balance
+                self.balance -= amount
+                print(f"Withdrawal successful. New balance is ${self.balance:.2f}")
+                print(f"Credit used: ${credit_used:.2f}")
+            return amount
+        
 
 def create_account():
     print("Create New Account")
@@ -201,7 +233,7 @@ def create_account():
     print("Select Account Type:")
     print("1. Credit Account (Can go negative up to $5000)")
     print("2. Debit Account (Cannot go negative)")
-    # print("3. Hybrid Account)
+    print("3. Hybrid Account(Linked to current but can use credit up to $2000)")
     
     while True:
         account_choice = input("Enter your choice (1-3): ")
@@ -211,9 +243,9 @@ def create_account():
         elif account_choice == '2':
             account_type = ACCOUNT_TYPES[1]  # "Debit Account"
             break
-        # elif account_choice == '3':
-        #     account_type = "Hybrid Account"
-        #     break
+        elif account_choice == '3':
+            account_type = ACCOUNT_TYPES[2]  # "Hybrid Account"
+            break
         else:
             print("Invalid choice. Please select 1, 2, or 3.")
     
@@ -225,27 +257,28 @@ def create_account():
     Create Customer Account
     '''
     if account_type == ACCOUNT_TYPES[0]:
-        account_obj = CreditAccount(name, customer_number, account_number)
+        account_obj = CreditAccount( account_number)
     elif account_type == ACCOUNT_TYPES[1]:
-        account_obj = DebitAccount(name, customer_number, account_number)
-    # elif account_type == "Hybrid Account":
-    #     account_obj = HybridAccount(name, customer_number, account_number)
+        account_obj = DebitAccount(account_number)
+    elif account_type == "Hybrid Account":
+        account_obj = HybridAccount(account_number)
 
     customer_obj.add_account(account_obj)
     all_accounts[account_number] = account_obj
 
+    save_data()
     print(f"\nAccount created successfully!")
-    print(f"Customer Name: {account_obj.name}")
-    print(f"Customer Number: {account_obj.customer_number}")
+    print(f"Customer Name: {customer_obj.name}")
+    print(f"Customer Number: {customer_obj.customer_number}")
     print(f"Account Number: {account_obj.account_number}")
     print(f"Account Type: {account_obj.account_type}")
     print(f"Initial Balance: ${account_obj.balance:.2f}")
 
     return account_obj
 
-def show_customer_accounts():
-    customer_number = int(input("Enter customer number: "))
-    if customer_number in customers:
-        customers[customer_number].show_all_accounts()
-    else:
-        print("Customer not found.")
+# def show_customer_accounts():
+#     customer_number = int(input("Enter customer number: "))
+#     if customer_number in customers:
+#         customers[customer_number].show_all_accounts()
+#     else:
+#         print("Customer not found.")

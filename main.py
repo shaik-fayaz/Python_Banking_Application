@@ -26,23 +26,10 @@ def main():
             else:
                 print("Please create an account first!")
         elif choice == '4':
-            if customer_obj:
-                amount = account.deposit(customer_obj)
-                # customer_obj.balance += amount
-                if amount > 0:
-                    print(f"${amount:.2f} deposited successfully!")
-                    print(f"New Balance: ${customer_obj.balance:.2f}")
-            else:
-                print("Please create an account first!")
+            account.deposit()
         elif choice == '5':
-            if customer_obj:
-                amount = account.withdraw(customer_obj)
-                customer_obj.balance -= amount
-                if amount > 0:
-                    print(f"${amount:.2f} withdrawn successfully!")
-            else:
-                print("Please create an account first!")
-        elif choice == '5':
+            account.withdraw()
+        elif choice == '6':
             is_running = False
         else:
             print("That is not a valid choice")
@@ -50,4 +37,5 @@ def main():
     print("Thank you! Have a nice day!")
 
 if __name__ == '__main__':
+    account.load_data()
     main()
